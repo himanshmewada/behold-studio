@@ -73,6 +73,7 @@ except Exception:
 SILENT = (not USE_VOICEOVER) or (_VOScene is None)
 
 if SILENT:
+
     class _SilentTracker:
         def __init__(self, scene, duration):
             self._scene, self.duration, self._t0 = scene, duration, scene._clock
@@ -108,25 +109,33 @@ else:
     Base = _VOScene
 
 # ------------------------------------------------------------------ palette
-BG      = "#080a0c"
+BG = "#080a0c"
 SURFACE = "#141a20"
-EDGE    = "#242d38"
-INK     = "#f3ece0"
-DIM     = "#8b939e"
-GOLD    = "#ffc233"
-CYAN    = "#2ee6d6"
+EDGE = "#242d38"
+INK = "#f3ece0"
+DIM = "#8b939e"
+GOLD = "#ffc233"
+CYAN = "#2ee6d6"
 MAGENTA = "#ff3d8b"
-ACID    = "#a3e635"
-RED     = "#ff5252"
-SEEDS   = ["#fff3b0", "#ffd166", "#ffa62b", "#ff6b35",
-           "#ef476f", "#b5179e", "#7209b7", "#3a86ff"]
+ACID = "#a3e635"
+RED = "#ff5252"
+SEEDS = [
+    "#fff3b0",
+    "#ffd166",
+    "#ffa62b",
+    "#ff6b35",
+    "#ef476f",
+    "#b5179e",
+    "#7209b7",
+    "#3a86ff",
+]
 
 # ------------------------------------------------------------- layout grid
-HUD_Y   = 3.80          # chapter chip row (nothing else may sit here)
-TITLE_Y = 3.24          # centred act titles
-COL_TOP = 3.02          # right column cursor start
-COL_L   = 0.45          # right column left edge
-COL_W   = 6.30          # right column max width
+HUD_Y = 3.80  # chapter chip row (nothing else may sit here)
+TITLE_Y = 3.24  # centred act titles
+COL_TOP = 3.02  # right column cursor start
+COL_L = 0.45  # right column left edge
+COL_W = 6.30  # right column max width
 RAIL_Y, RAIL_X0, RAIL_X1 = -3.74, -6.55, 6.55
 
 CHAPTERS = [
@@ -140,14 +149,14 @@ CHAPTERS = [
 
 # --------------------------------------------------------------------- math
 PHI = (1.0 + np.sqrt(5.0)) / 2.0
-GOLD_T = 1.0 / PHI ** 2
+GOLD_T = 1.0 / PHI**2
 GOLD_DEG = 360.0 * GOLD_T
 HURWITZ = 1.0 / np.sqrt(5.0)
 
 
 def hexlerp(h1, h2, t):
-    a = np.array([int(h1[i:i + 2], 16) for i in (1, 3, 5)], dtype=float)
-    b = np.array([int(h2[i:i + 2], 16) for i in (1, 3, 5)], dtype=float)
+    a = np.array([int(h1[i : i + 2], 16) for i in (1, 3, 5)], dtype=float)
+    b = np.array([int(h2[i : i + 2], 16) for i in (1, 3, 5)], dtype=float)
     c = np.round(a + (b - a) * t).astype(int)
     return "#%02x%02x%02x" % tuple(c)
 
@@ -165,9 +174,9 @@ def vogel(n, turns, c, center=ORIGIN):
     k = np.arange(n, dtype=float)
     r = c * np.sqrt(k)
     a = TAU * turns * k
-    return np.column_stack([center[0] + r * np.cos(a),
-                            center[1] + r * np.sin(a),
-                            np.zeros(n)])
+    return np.column_stack(
+        [center[0] + r * np.cos(a), center[1] + r * np.sin(a), np.zeros(n)]
+    )
 
 
 def residual_turns(step):
@@ -233,8 +242,9 @@ def txt(s, size=30, color=INK, maxw=6.3, weight=NORMAL):
 
 
 def body(s, size=25, color=INK, maxw=COL_W, width=40):
-    return fit(Text(wrap(s, width), font_size=size, color=color,
-                    line_spacing=0.9), maxw)
+    return fit(
+        Text(wrap(s, width), font_size=size, color=color, line_spacing=0.9), maxw
+    )
 
 
 def tex(s, size=36, color=INK, maxw=COL_W):
@@ -279,41 +289,59 @@ class TheMostIrrationalNumber(Base):
     def metric_row(self, label, value, col, vmax=1.6, w=4.6):
         lab = tex(label, 30, col, w)
         bw = float(np.clip(value / vmax, 0.03, 1.0)) * w
-        bg = Rectangle(width=w, height=0.13, stroke_width=0,
-                       fill_color=EDGE, fill_opacity=1)
-        bar = Rectangle(width=bw, height=0.13, stroke_width=0,
-                        fill_color=col, fill_opacity=1)
+        bg = Rectangle(
+            width=w, height=0.13, stroke_width=0, fill_color=EDGE, fill_opacity=1
+        )
+        bar = Rectangle(
+            width=bw, height=0.13, stroke_width=0, fill_color=col, fill_opacity=1
+        )
         bar.align_to(bg, LEFT)
-        return VGroup(lab, VGroup(bg, bar)).arrange(
-            DOWN, aligned_edge=LEFT, buff=0.14)
+        return VGroup(lab, VGroup(bg, bar)).arrange(DOWN, aligned_edge=LEFT, buff=0.14)
 
     # ------------------------------------------------------------------- hud
     def build_hud(self):
         bg = Rectangle(width=14.4, height=8.2, stroke_width=0)
         bg.set_fill(color=["#0d1218", "#06080a"], opacity=1)
-        grain = VGroup(*[
-            Circle(radius=r, stroke_width=0, fill_color=SEEDS[3],
-                   fill_opacity=o).move_to([0, 0.15, 0])
-            for r, o in ((5.4, 0.020), (4.0, 0.024), (2.9, 0.028))
-        ])
+        grain = VGroup(
+            *[
+                Circle(
+                    radius=r, stroke_width=0, fill_color=SEEDS[3], fill_opacity=o
+                ).move_to([0, 0.15, 0])
+                for r, o in ((5.4, 0.020), (4.0, 0.024), (2.9, 0.028))
+            ]
+        )
         self.add(bg, grain)
 
-        rail = Line([RAIL_X0, RAIL_Y, 0], [RAIL_X1, RAIL_Y, 0],
-                    stroke_color=EDGE, stroke_width=4)
-        ticks = VGroup(*[
-            Line([RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y - 0.075, 0],
-                 [RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y + 0.075, 0],
-                 stroke_color="#39424f", stroke_width=2)
-            for f, _ in CHAPTERS
-        ])
+        rail = Line(
+            [RAIL_X0, RAIL_Y, 0],
+            [RAIL_X1, RAIL_Y, 0],
+            stroke_color=EDGE,
+            stroke_width=4,
+        )
+        ticks = VGroup(
+            *[
+                Line(
+                    [RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y - 0.075, 0],
+                    [RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y + 0.075, 0],
+                    stroke_color="#39424f",
+                    stroke_width=2,
+                )
+                for f, _ in CHAPTERS
+            ]
+        )
         self.prog = ValueTracker(0.004)
-        fill = Line([RAIL_X0, RAIL_Y, 0], [RAIL_X0 + 0.05, RAIL_Y, 0],
-                    stroke_color=GOLD, stroke_width=5)
+        fill = Line(
+            [RAIL_X0, RAIL_Y, 0],
+            [RAIL_X0 + 0.05, RAIL_Y, 0],
+            stroke_color=GOLD,
+            stroke_width=5,
+        )
 
         def up(m):
             f = self.prog.get_value()
-            m.put_start_and_end_on([RAIL_X0, RAIL_Y, 0],
-                                   [RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y, 0])
+            m.put_start_and_end_on(
+                [RAIL_X0, RAIL_Y, 0], [RAIL_X0 + f * (RAIL_X1 - RAIL_X0), RAIL_Y, 0]
+            )
 
         fill.add_updater(up)
         self.add(rail, ticks, fill)
@@ -322,8 +350,7 @@ class TheMostIrrationalNumber(Base):
 
     def chapter(self, i, run_time=1.0):
         frac, name = CHAPTERS[i]
-        lab = txt(name, 18, DIM, 5.2).move_to([-6.55, HUD_Y, 0],
-                                              aligned_edge=LEFT)
+        lab = txt(name, 18, DIM, 5.2).move_to([-6.55, HUD_Y, 0], aligned_edge=LEFT)
         anims = [self.prog.animate.set_value(max(0.004, frac)), FadeIn(lab)]
         if self._chap is not None:
             anims.append(FadeOut(self._chap))
@@ -335,8 +362,9 @@ class TheMostIrrationalNumber(Base):
         pts = vogel(n, turns, c, center)
         cols = seed_palette(n)
         dr = dot_scale * c * np.sqrt(PI)
-        dots = VGroup(*[Dot(pts[i], radius=dr, color=cols[i], stroke_width=0)
-                        for i in range(n)])
+        dots = VGroup(
+            *[Dot(pts[i], radius=dr, color=cols[i], stroke_width=0) for i in range(n)]
+        )
         return dots, pts
 
     def reveal_updater(self, dots, tracker):
@@ -344,6 +372,7 @@ class TheMostIrrationalNumber(Base):
             v = tracker.get_value()
             for i, d in enumerate(g):
                 d.set_fill(opacity=float(np.clip(v - i, 0.0, 1.0)))
+
         dots.add_updater(up)
 
     def place_updater(self, dots, n, turns_tr, c, center):
@@ -356,6 +385,7 @@ class TheMostIrrationalNumber(Base):
             ys = center[1] + r * np.sin(a)
             for i, d in enumerate(g):
                 d.move_to([xs[i], ys[i], 0.0])
+
         dots.add_updater(up)
 
     def freeze(self, dots):
@@ -369,8 +399,9 @@ class TheMostIrrationalNumber(Base):
             idx = np.arange(j, n, step)
             if len(idx) < 3:
                 continue
-            curve = VMobject(stroke_color=color, stroke_width=width,
-                             stroke_opacity=opacity)
+            curve = VMobject(
+                stroke_color=color, stroke_width=width, stroke_opacity=opacity
+            )
             curve.set_points_smoothly(pts[idx])
             fam.add(curve)
         return fam
@@ -409,8 +440,11 @@ class TheMostIrrationalNumber(Base):
         ) as tr:
             d = tr.duration
             self.play(FadeIn(hook, shift=DOWN * 0.12), run_time=d * 0.22)
-            self.play(grow.animate.set_value(N), run_time=d * 0.70,
-                      rate_func=rate_functions.ease_out_cubic)
+            self.play(
+                grow.animate.set_value(N),
+                run_time=d * 0.70,
+                rate_func=rate_functions.ease_out_cubic,
+            )
             self.freeze(dots)
             self.rest(tr)
 
@@ -427,30 +461,38 @@ class TheMostIrrationalNumber(Base):
             "and eighty nine. Always neighbours."
         ) as tr:
             d = tr.duration
-            self.play(dots.animate.set_fill(opacity=0.42),
-                      LaggedStart(*[Create(s) for s in famA], lag_ratio=0.02),
-                      run_time=d * 0.30)
+            self.play(
+                dots.animate.set_fill(opacity=0.42),
+                LaggedStart(*[Create(s) for s in famA], lag_ratio=0.02),
+                run_time=d * 0.30,
+            )
             self.play(FadeIn(nA, scale=0.7), FadeIn(lA), run_time=d * 0.12)
-            self.play(LaggedStart(*[Create(s) for s in famB], lag_ratio=0.02),
-                      run_time=d * 0.32)
+            self.play(
+                LaggedStart(*[Create(s) for s in famB], lag_ratio=0.02),
+                run_time=d * 0.32,
+            )
             self.play(FadeIn(nB, scale=0.7), FadeIn(lB), run_time=d * 0.12)
             self.rest(tr)
 
-        fib = tex(r"1,\;1,\;2,\;3,\;5,\;8,\;13,\;21,\;34,\;55,\;89",
-                  36, GOLD, 8.4).move_to([0, -3.20, 0])
+        fib = tex(
+            r"1,\;1,\;2,\;3,\;5,\;8,\;13,\;21,\;34,\;55,\;89", 36, GOLD, 8.4
+        ).move_to([0, -3.20, 0])
         with self.voiceover(
             "Nature is counting in Fibonacci. And there is a reason. It comes down "
             "to the one number that is hardest to turn into a fraction."
         ) as tr:
             d = tr.duration
             self.play(FadeIn(fib, shift=UP * 0.12), run_time=d * 0.35)
-            self.play(Indicate(nA, color=CYAN, scale_factor=1.25),
-                      Indicate(nB, color=MAGENTA, scale_factor=1.25),
-                      run_time=d * 0.35)
+            self.play(
+                Indicate(nA, color=CYAN, scale_factor=1.25),
+                Indicate(nB, color=MAGENTA, scale_factor=1.25),
+                run_time=d * 0.35,
+            )
             self.rest(tr)
 
-        self.play(FadeOut(VGroup(dots, famA, famB, nA, nB, lA, lB, fib, hook)),
-                  run_time=0.9)
+        self.play(
+            FadeOut(VGroup(dots, famA, famB, nA, nB, lA, lB, fib, hook)), run_time=0.9
+        )
 
     # ================================================================== ACT 2
     def act_recipe(self):
@@ -465,15 +507,22 @@ class TheMostIrrationalNumber(Base):
         ring = Circle(radius=R, stroke_color=EDGE, stroke_width=2).move_to(C)
         self.add(ring, dots)
 
-        rule = tex(r"\theta_k = 360^{\circ}\,k\,t,\qquad r_k = c\sqrt{k}",
-                   34, GOLD, COL_W)
+        rule = tex(
+            r"\theta_k = 360^{\circ}\,k\,t,\qquad r_k = c\sqrt{k}", 34, GOLD, COL_W
+        )
         why = body("Square-root spacing gives every seed the same amount of room.")
         self.stack([rule, why], top=COL_TOP)
 
         # divergence-angle protractor: reference ray + one turn of size t
-        panel = RoundedRectangle(corner_radius=0.14, width=4.0, height=1.30,
-                                 stroke_color=EDGE, stroke_width=1.6,
-                                 fill_color=SURFACE, fill_opacity=0.95)
+        panel = RoundedRectangle(
+            corner_radius=0.14,
+            width=4.0,
+            height=1.30,
+            stroke_color=EDGE,
+            stroke_width=1.6,
+            fill_color=SURFACE,
+            fill_opacity=0.95,
+        )
         panel.move_to([3.60, 0.30, 0])
         plab = txt("angle between consecutive seeds", 19, DIM, 3.6)
         plab.move_to([3.60, 0.78, 0])
@@ -513,8 +562,15 @@ class TheMostIrrationalNumber(Base):
             d = tr.duration
             self.play(FadeIn(ring), Write(rule), run_time=d * 0.24)
             self.play(FadeIn(why), run_time=d * 0.16)
-            self.play(FadeIn(panel), FadeIn(plab), FadeIn(ray0), FadeIn(pivot),
-                      FadeIn(ray1), FadeIn(deg), run_time=d * 0.20)
+            self.play(
+                FadeIn(panel),
+                FadeIn(plab),
+                FadeIn(ray0),
+                FadeIn(pivot),
+                FadeIn(ray1),
+                FadeIn(deg),
+                run_time=d * 0.20,
+            )
             ang.update(0)
             self.play(FadeIn(ang), run_time=0.4)
             self.rest(tr)
@@ -531,23 +587,49 @@ class TheMostIrrationalNumber(Base):
         ) as tr:
             d = tr.duration
             self.play(FadeIn(bad1), run_time=d * 0.12)
-            self.play(turns.animate.set_value(1 / 3), run_time=d * 0.20,
-                      rate_func=smooth)
+            self.play(
+                turns.animate.set_value(1 / 3), run_time=d * 0.20, rate_func=smooth
+            )
             self.play(FadeIn(bad2), run_time=d * 0.10)
-            self.play(turns.animate.set_value(0.30), run_time=d * 0.14,
-                      rate_func=smooth)
-            self.play(turns.animate.set_value(GOLD_T), run_time=d * 0.30,
-                      rate_func=smooth)
-            self.play(FadeIn(good), Flash(dots, color=ACID, line_length=0.3,
-                                          num_lines=18, flash_radius=2.6),
-                      run_time=max(0.9, d * 0.14))
+            self.play(
+                turns.animate.set_value(0.30), run_time=d * 0.14, rate_func=smooth
+            )
+            self.play(
+                turns.animate.set_value(GOLD_T), run_time=d * 0.30, rate_func=smooth
+            )
+            self.play(
+                FadeIn(good),
+                Flash(
+                    dots, color=ACID, line_length=0.3, num_lines=18, flash_radius=2.6
+                ),
+                run_time=max(0.9, d * 0.14),
+            )
             self.rest(tr)
 
         self.freeze(dots)
         ray1.clear_updaters()
         ang.update(0)
-        self.play(FadeOut(VGroup(ring, dots, rule, why, panel, plab, ray0, ray1,
-                                 pivot, ang, deg, bad1, bad2, good)), run_time=0.8)
+        self.play(
+            FadeOut(
+                VGroup(
+                    ring,
+                    dots,
+                    rule,
+                    why,
+                    panel,
+                    plab,
+                    ray0,
+                    ray1,
+                    pivot,
+                    ang,
+                    deg,
+                    bad1,
+                    bad2,
+                    good,
+                )
+            ),
+            run_time=0.8,
+        )
 
     # ================================================================== ACT 3
     def act_fractions(self):
@@ -567,23 +649,32 @@ class TheMostIrrationalNumber(Base):
             C = np.array([x, 1.00, 0.0])
             dots, _ = self.head(n, t, c, C)
             ring = Circle(radius=R, stroke_color=EDGE, stroke_width=1.6).move_to(C)
-            label = (tex(r"t = \tfrac{1}{\varphi^{2}}", 30, col, 2.6)
-                     if p is None else tex(rf"t = \tfrac{{{p}}}{{{q}}}", 30, col, 2.6))
+            label = (
+                tex(r"t = \tfrac{1}{\varphi^{2}}", 30, col, 2.6)
+                if p is None
+                else tex(rf"t = \tfrac{{{p}}}{{{q}}}", 30, col, 2.6)
+            )
             label.move_to([x, 2.52, 0])
-            rays = (tex(r"\infty", 28, col, 1.6) if p is None
-                    else tex(rf"{q}\ \mathrm{{rays}}", 26, col, 2.6))
+            rays = (
+                tex(r"\infty", 28, col, 1.6)
+                if p is None
+                else tex(rf"{q}\ \mathrm{{rays}}", 26, col, 2.6)
+            )
             rays.move_to([x, -0.48, 0])
             w = float(np.clip(g / 5.5, 0.04, 1.0)) * 2.3
-            bar_bg = Rectangle(width=2.3, height=0.13, stroke_width=0,
-                               fill_color=EDGE, fill_opacity=1).move_to([x, -0.92, 0])
-            bar = Rectangle(width=w, height=0.13, stroke_width=0,
-                            fill_color=col, fill_opacity=1)
+            bar_bg = Rectangle(
+                width=2.3, height=0.13, stroke_width=0, fill_color=EDGE, fill_opacity=1
+            ).move_to([x, -0.92, 0])
+            bar = Rectangle(
+                width=w, height=0.13, stroke_width=0, fill_color=col, fill_opacity=1
+            )
             bar.move_to([x - 1.15 + w / 2, -0.92, 0])
             val = tex(rf"{g:.2f}", 25, col, 1.6).move_to([x, -1.26, 0])
             cards.add(VGroup(ring, dots, label, rays, bar_bg, bar, val))
 
-        cap = txt("bar = biggest empty gap, in units of the ideal seed spacing",
-                  22, DIM, 9.6).move_to([0, -1.82, 0])
+        cap = txt(
+            "bar = biggest empty gap, in units of the ideal seed spacing", 22, DIM, 9.6
+        ).move_to([0, -1.82, 0])
 
         with self.voiceover(
             "So why do fractions ruin it? If your angle is p over q of a full turn, "
@@ -613,11 +704,17 @@ class TheMostIrrationalNumber(Base):
         t3 = body("Close enough to fool a small flower.")
         self.stack([t1, t2, t3], top=COL_TOP, buff=0.34)
 
-        t4 = body("Keep growing and thirty-four spokes creep out. "
-                  "Every fraction betrays you eventually.", color=RED)
+        t4 = body(
+            "Keep growing and thirty-four spokes creep out. "
+            "Every fraction betrays you eventually.",
+            color=RED,
+        )
         self.stack([t4], top=0.55)
-        t5 = body("So nature wants the number that stays farthest from every "
-                  "fraction there is.", color=GOLD)
+        t5 = body(
+            "So nature wants the number that stays farthest from every "
+            "fraction there is.",
+            color=GOLD,
+        )
         self.stack([t5], top=-0.85)
 
         with self.voiceover(
@@ -629,10 +726,18 @@ class TheMostIrrationalNumber(Base):
             self.play(FadeOut(cards), FadeOut(cap), FadeOut(title), run_time=d * 0.14)
             self.play(FadeIn(ring_g), FadeIn(t1), FadeIn(t2), run_time=d * 0.16)
             self.add(dots_g)
-            self.play(FadeIn(t3), grow.animate.set_value(200), run_time=d * 0.20,
-                      rate_func=linear)
-            self.play(FadeIn(t4), grow.animate.set_value(Ng), run_time=d * 0.32,
-                      rate_func=linear)
+            self.play(
+                FadeIn(t3),
+                grow.animate.set_value(200),
+                run_time=d * 0.20,
+                rate_func=linear,
+            )
+            self.play(
+                FadeIn(t4),
+                grow.animate.set_value(Ng),
+                run_time=d * 0.32,
+                rate_func=linear,
+            )
             self.freeze(dots_g)
             self.play(FadeIn(t5), run_time=max(0.7, d * 0.18))
             self.rest(tr)
@@ -646,10 +751,16 @@ class TheMostIrrationalNumber(Base):
         # ---- exact golden-rectangle subdivision + tangent-continuous spiral
         s = 2.25
         ox, oy = -3.55, 0.05
-        map_pt = lambda p: np.array([ox + (p[0] - PHI / 2) * s,
-                                     oy + (p[1] - 0.5) * s, 0.0])
-        outer = Rectangle(width=PHI * s, height=s, stroke_color=GOLD,
-                          stroke_width=2.4, stroke_opacity=0.9)
+        map_pt = lambda p: np.array(
+            [ox + (p[0] - PHI / 2) * s, oy + (p[1] - 0.5) * s, 0.0]
+        )
+        outer = Rectangle(
+            width=PHI * s,
+            height=s,
+            stroke_color=GOLD,
+            stroke_width=2.4,
+            stroke_opacity=0.9,
+        )
         outer.move_to(map_pt([PHI / 2, 0.5]))
 
         centre = np.array([1.0, 1.0])
@@ -661,27 +772,47 @@ class TheMostIrrationalNumber(Base):
             corner = centre + np.array([sx * r, sy * r])
             lo = np.minimum(centre, corner)
             col = SEEDS[(i + 1) % len(SEEDS)]
-            sq = Rectangle(width=r * s, height=r * s, stroke_color=col,
-                           stroke_width=1.6, stroke_opacity=0.85,
-                           fill_color=col, fill_opacity=0.13)
+            sq = Rectangle(
+                width=r * s,
+                height=r * s,
+                stroke_color=col,
+                stroke_width=1.6,
+                stroke_opacity=0.85,
+                fill_color=col,
+                fill_opacity=0.13,
+            )
             sq.move_to(map_pt(lo + np.array([r / 2, r / 2])))
             squares.add(sq)
             a0 = PI + i * PI / 2
-            arcs.add(Arc(radius=r * s, start_angle=a0, angle=PI / 2,
-                         arc_center=map_pt(centre), stroke_color=GOLD,
-                         stroke_width=3.2))
+            arcs.add(
+                Arc(
+                    radius=r * s,
+                    start_angle=a0,
+                    angle=PI / 2,
+                    arc_center=map_pt(centre),
+                    stroke_color=GOLD,
+                    stroke_width=3.2,
+                )
+            )
             end = centre + r * np.array([np.cos(a0 + PI / 2), np.sin(a0 + PI / 2)])
             centre = centre + (r - PHI ** (-(i + 1))) * (end - centre) / r
 
-        rest_rect = Rectangle(width=(PHI - 1) * s, height=s, stroke_color=CYAN,
-                              stroke_width=3, stroke_opacity=0.95)
+        rest_rect = Rectangle(
+            width=(PHI - 1) * s,
+            height=s,
+            stroke_color=CYAN,
+            stroke_width=3,
+            stroke_opacity=0.95,
+        )
         rest_rect.move_to(map_pt([1 + (PHI - 1) / 2, 0.5]))
 
         # ---- phase A
         headA = tex(r"\varphi = 1.6180339887\ldots", 34, GOLD, COL_W)
         eqA = tex(r"\varphi = 1 + \frac{1}{\varphi}", 42, INK, COL_W)
-        noteA = body("Cut a square. The leftover is the same shape, "
-                     "turned and smaller.", color=DIM)
+        noteA = body(
+            "Cut a square. The leftover is the same shape, turned and smaller.",
+            color=DIM,
+        )
         self.stack([headA, eqA, noteA], top=COL_TOP, buff=0.36)
 
         with self.voiceover(
@@ -695,23 +826,30 @@ class TheMostIrrationalNumber(Base):
             self.play(FadeIn(headA), Create(outer), run_time=d * 0.18)
             self.play(FadeIn(squares[0]), Create(arcs[0]), run_time=d * 0.16)
             self.play(Create(rest_rect), FadeIn(noteA), run_time=d * 0.14)
-            self.play(LaggedStart(*[FadeIn(q) for q in squares[1:]], lag_ratio=0.12),
-                      LaggedStart(*[Create(a) for a in arcs[1:]], lag_ratio=0.12),
-                      run_time=d * 0.30)
+            self.play(
+                LaggedStart(*[FadeIn(q) for q in squares[1:]], lag_ratio=0.12),
+                LaggedStart(*[Create(a) for a in arcs[1:]], lag_ratio=0.12),
+                run_time=d * 0.30,
+            )
             self.play(FadeOut(rest_rect), Write(eqA), run_time=d * 0.22)
             self.rest(tr)
 
         # ---- phase B (panel A is cleared first: no stacked leftovers)
-        cf = tex(r"\varphi = 1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{1 + \cdots}}}",
-                 40, INK, 3.4).move_to([-3.55, 0.10, 0])
+        cf = tex(
+            r"\varphi = 1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{1 + \cdots}}}",
+            40,
+            INK,
+            3.4,
+        ).move_to([-3.55, 0.10, 0])
         cf_bg = BackgroundRectangle(cf, color=BG, buff=0.24, fill_opacity=0.9)
 
         ones = body("All ones. The worst possible ingredient.", color=GOLD)
         gift = body("A big entry is a gift: a suspiciously good approximation.")
         pi_cf = tex(r"\pi = [3;\,7,\,15,\,1,\,\mathbf{292},\ldots]", 32, MAGENTA, COL_W)
         pi_best = tex(r"\tfrac{355}{113} = 3.14159292\ldots", 32, MAGENTA, COL_W)
-        pi_note = body("Six correct decimals from a three digit denominator.",
-                       size=23, color=DIM)
+        pi_note = body(
+            "Six correct decimals from a three digit denominator.", size=23, color=DIM
+        )
         self.stack([ones, gift, pi_cf, pi_best, pi_note], top=COL_TOP, buff=0.32)
 
         with self.voiceover(
@@ -723,21 +861,30 @@ class TheMostIrrationalNumber(Base):
             "from a three digit denominator."
         ) as tr:
             d = tr.duration
-            self.play(FadeOut(VGroup(outer, squares, arcs, headA, eqA, noteA)),
-                      run_time=d * 0.14)
+            self.play(
+                FadeOut(VGroup(outer, squares, arcs, headA, eqA, noteA)),
+                run_time=d * 0.14,
+            )
             self.play(FadeIn(cf_bg), Write(cf), FadeIn(ones), run_time=d * 0.26)
             self.play(FadeIn(gift), run_time=d * 0.12)
             self.play(Write(pi_cf), run_time=d * 0.18)
-            self.play(FadeIn(pi_best, shift=UP * 0.1), FadeIn(pi_note),
-                      run_time=d * 0.20)
+            self.play(
+                FadeIn(pi_best, shift=UP * 0.1), FadeIn(pi_note), run_time=d * 0.20
+            )
             self.rest(tr)
 
         # ---- phase C
-        fibs = tex(r"\tfrac{1}{1},\tfrac{2}{1},\tfrac{3}{2},\tfrac{5}{3},"
-                   r"\tfrac{8}{5},\tfrac{13}{8},\tfrac{21}{13},\tfrac{34}{21},"
-                   r"\tfrac{55}{34}", 32, GOLD, COL_W)
-        fib_note = body("Phi's best attempts are Fibonacci over Fibonacci. "
-                        "And they crawl.")
+        fibs = tex(
+            r"\tfrac{1}{1},\tfrac{2}{1},\tfrac{3}{2},\tfrac{5}{3},"
+            r"\tfrac{8}{5},\tfrac{13}{8},\tfrac{21}{13},\tfrac{34}{21},"
+            r"\tfrac{55}{34}",
+            32,
+            GOLD,
+            COL_W,
+        )
+        fib_note = body(
+            "Phi's best attempts are Fibonacci over Fibonacci. And they crawl."
+        )
         self.stack([fibs, fib_note], top=COL_TOP, buff=0.36)
 
         with self.voiceover(
@@ -745,25 +892,40 @@ class TheMostIrrationalNumber(Base):
             "Fibonacci numbers, and they crawl."
         ) as tr:
             d = tr.duration
-            self.play(FadeOut(VGroup(ones, gift, pi_cf, pi_best, pi_note)),
-                      run_time=d * 0.25)
-            self.play(FadeIn(fibs, shift=UP * 0.1), FadeIn(fib_note),
-                      run_time=d * 0.55)
+            self.play(
+                FadeOut(VGroup(ones, gift, pi_cf, pi_best, pi_note)), run_time=d * 0.25
+            )
+            self.play(FadeIn(fibs, shift=UP * 0.1), FadeIn(fib_note), run_time=d * 0.55)
             self.rest(tr)
 
         # ---- phase D: the scoreboard, |x - p/q| q^2 against log10(q)
         LX = float(np.log10(230))
-        ax = Axes(x_range=[0, LX, 1], y_range=[0, 1.0, 0.2],
-                  x_length=6.0, y_length=2.70, tips=False,
-                  axis_config={"stroke_color": EDGE, "stroke_width": 2,
-                               "tick_size": 0.05,
-                               "include_numbers": False}).move_to([3.45, -0.80, 0])
+        ax = Axes(
+            x_range=[0, LX, 1],
+            y_range=[0, 1.0, 0.2],
+            x_length=6.0,
+            y_length=2.70,
+            tips=False,
+            axis_config={
+                "stroke_color": EDGE,
+                "stroke_width": 2,
+                "tick_size": 0.05,
+                "include_numbers": False,
+            },
+        ).move_to([3.45, -0.80, 0])
         P = lambda q, v: ax.c2p(float(np.log10(q)), v)
 
-        ceil = DashedLine(P(1, HURWITZ), P(230, HURWITZ), color=GOLD,
-                          stroke_width=2, stroke_opacity=0.75, dash_length=0.09)
+        ceil = DashedLine(
+            P(1, HURWITZ),
+            P(230, HURWITZ),
+            color=GOLD,
+            stroke_width=2,
+            stroke_opacity=0.75,
+            dash_length=0.09,
+        )
         ceil_lab = tex(r"\tfrac{1}{\sqrt{5}}", 26, GOLD, 0.8).next_to(
-            ceil, LEFT, buff=0.12)
+            ceil, LEFT, buff=0.12
+        )
 
         series = [
             (quality(convergents(CF_PHI, 10)[2:], PHI), GOLD, r"\varphi"),
@@ -773,23 +935,35 @@ class TheMostIrrationalNumber(Base):
         plots, labels, markers = VGroup(), VGroup(), VGroup()
         for data, col, name in series:
             pts = [P(q, v) for q, v in data]
-            seg = VGroup(*[Line(pts[i], pts[i + 1], stroke_color=col,
-                                stroke_width=2.6, stroke_opacity=0.9)
-                           for i in range(len(pts) - 1)])
+            seg = VGroup(
+                *[
+                    Line(
+                        pts[i],
+                        pts[i + 1],
+                        stroke_color=col,
+                        stroke_width=2.6,
+                        stroke_opacity=0.9,
+                    )
+                    for i in range(len(pts) - 1)
+                ]
+            )
             dd = VGroup(*[Dot(p, radius=0.045, color=col) for p in pts])
             plots.add(VGroup(seg, dd))
             markers.add(dd)
             labels.add(tex(name, 30, col, 0.8).next_to(pts[-1], UR, buff=0.10))
 
-        xlabels = VGroup(*[
-            txt(s, 20, DIM, 0.8).next_to(P(q, 0), DOWN, buff=0.14)
-            for q, s in ((1, "1"), (10, "10"), (100, "100"))
-        ])
+        xlabels = VGroup(
+            *[
+                txt(s, 20, DIM, 0.8).next_to(P(q, 0), DOWN, buff=0.14)
+                for q, s in ((1, "1"), (10, "10"), (100, "100"))
+            ]
+        )
         ylab = tex(r"\left|x - \tfrac{p}{q}\right| \cdot q^{2}", 26, DIM, 2.4)
         ylab.next_to(ax, UP, buff=0.14).align_to(ax, LEFT)
         xlab = txt("denominator q", 20, DIM, 2.4).next_to(ax, DOWN, buff=0.32)
-        verdict = body("Phi never dips. It sits on the ceiling forever.",
-                       color=GOLD).move_to([3.45, -3.20, 0])
+        verdict = body(
+            "Phi never dips. It sits on the ceiling forever.", color=GOLD
+        ).move_to([3.45, -3.20, 0])
 
         with self.voiceover(
             "Here is the scoreboard. Error times denominator squared. Root two "
@@ -800,19 +974,30 @@ class TheMostIrrationalNumber(Base):
         ) as tr:
             d = tr.duration
             self.play(FadeOut(VGroup(cf, cf_bg, fibs, fib_note)), run_time=d * 0.10)
-            self.play(Create(ax), FadeIn(xlabels), FadeIn(ylab), FadeIn(xlab),
-                      run_time=d * 0.12)
+            self.play(
+                Create(ax),
+                FadeIn(xlabels),
+                FadeIn(ylab),
+                FadeIn(xlab),
+                run_time=d * 0.12,
+            )
             self.play(Create(ceil), FadeIn(ceil_lab), run_time=d * 0.10)
             self.play(Create(plots[1]), FadeIn(labels[1]), run_time=d * 0.13)
             self.play(Create(plots[2]), FadeIn(labels[2]), run_time=d * 0.15)
             self.play(Create(plots[0]), FadeIn(labels[0]), run_time=d * 0.15)
-            self.play(FadeIn(verdict),
-                      Indicate(markers[0][-1], color=GOLD, scale_factor=1.8),
-                      run_time=d * 0.15)
+            self.play(
+                FadeIn(verdict),
+                Indicate(markers[0][-1], color=GOLD, scale_factor=1.8),
+                run_time=d * 0.15,
+            )
             self.rest(tr)
 
-        self.play(FadeOut(VGroup(ax, xlabels, ylab, xlab, ceil, ceil_lab,
-                                 plots, labels, verdict)), run_time=0.9)
+        self.play(
+            FadeOut(
+                VGroup(ax, xlabels, ylab, xlab, ceil, ceil_lab, plots, labels, verdict)
+            ),
+            run_time=0.9,
+        )
 
     # ================================================================== ACT 5
     def act_fibonacci(self):
@@ -855,18 +1040,26 @@ class TheMostIrrationalNumber(Base):
             "Join them, and the next, and the next, and you trace one spiral."
         ) as tr:
             d = tr.duration
-            self.play(LaggedStart(*[GrowFromCenter(p) for p in chain],
-                                  lag_ratio=0.10), run_time=d * 0.55)
+            self.play(
+                LaggedStart(*[GrowFromCenter(p) for p in chain], lag_ratio=0.10),
+                run_time=d * 0.55,
+            )
             self.play(Create(one), FadeIn(mod), FadeIn(n2), run_time=d * 0.45)
             self.rest(tr)
 
         famA = self.family(N, 34, GOLD_T, c, C, CYAN, 1.9, 0.8)
         famB = self.family(N, 55, GOLD_T, c, C, MAGENTA, 1.9, 0.8)
-        why = body("Seeds 34 apart share a remainder mod 34, so the family has "
-                   "exactly 34 members.", size=23, color=DIM)
+        why = body(
+            "Seeds 34 apart share a remainder mod 34, so the family has "
+            "exactly 34 members.",
+            size=23,
+            color=DIM,
+        )
         cntA = tex(rf"{len(famA)}\ \mathrm{{spirals}}", 32, CYAN, COL_W)
         e2 = tex(rf"55\,t = {55 * GOLD_T:.6f}\ \mathrm{{turns}}", 30, MAGENTA, COL_W)
-        e2b = tex(rf"\mathrm{{offset}} = {r55 * 360:+.3f}^{{\circ}}", 30, MAGENTA, COL_W)
+        e2b = tex(
+            rf"\mathrm{{offset}} = {r55 * 360:+.3f}^{{\circ}}", 30, MAGENTA, COL_W
+        )
         cntB = tex(rf"{len(famB)}\ \mathrm{{spirals}}", 32, MAGENTA, COL_W)
         self.stack([why, cntA, e2, e2b, cntB], top=0.62, buff=0.26)
 
@@ -878,18 +1071,27 @@ class TheMostIrrationalNumber(Base):
             "spirals. The flower was never counting. It was just refusing to line up."
         ) as tr:
             d = tr.duration
-            self.play(FadeOut(VGroup(mod, n2, one, chain)), FadeIn(why),
-                      run_time=d * 0.14)
-            self.play(LaggedStart(*[Create(s) for s in famA], lag_ratio=0.02),
-                      run_time=d * 0.24)
+            self.play(
+                FadeOut(VGroup(mod, n2, one, chain)), FadeIn(why), run_time=d * 0.14
+            )
+            self.play(
+                LaggedStart(*[Create(s) for s in famA], lag_ratio=0.02),
+                run_time=d * 0.24,
+            )
             self.play(FadeIn(cntA), run_time=d * 0.08)
-            self.play(LaggedStart(*[Create(s) for s in famB], lag_ratio=0.02),
-                      run_time=d * 0.24)
+            self.play(
+                LaggedStart(*[Create(s) for s in famB], lag_ratio=0.02),
+                run_time=d * 0.24,
+            )
             self.play(FadeIn(e2), FadeIn(e2b), FadeIn(cntB), run_time=d * 0.18)
             self.rest(tr)
 
-        self.play(FadeOut(VGroup(dots, ring, famA, famB, e1, e1b, n1, why,
-                                 cntA, e2, e2b, cntB)), run_time=0.9)
+        self.play(
+            FadeOut(
+                VGroup(dots, ring, famA, famB, e1, e1b, n1, why, cntA, e2, e2b, cntB)
+            ),
+            run_time=0.9,
+        )
 
     # ================================================================== ACT 6
     def act_payoff(self):
@@ -907,19 +1109,24 @@ class TheMostIrrationalNumber(Base):
         g1 = gap_metric(N, GOLD_T, c)
         vmax = max(g0, g1) * 1.15
 
-        head = body("Impossible to approximate = never leaves a gap.",
-                    size=28, color=GOLD)
+        head = body(
+            "Impossible to approximate = never leaves a gap.", size=28, color=GOLD
+        )
         row0 = self.metric_row(rf"t=\tfrac{{13}}{{34}}:\quad {g0:.2f}", g0, RED, vmax)
-        row1 = self.metric_row(rf"t=\tfrac{{1}}{{\varphi^{{2}}}}:\quad {g1:.2f}",
-                               g1, ACID, vmax)
+        row1 = self.metric_row(
+            rf"t=\tfrac{{1}}{{\varphi^{{2}}}}:\quad {g1:.2f}", g1, ACID, vmax
+        )
         sub = body("biggest empty gap, same seed count", size=22, color=DIM)
         self.stack([head, row0, row1, sub], top=COL_TOP, buff=0.30)
 
-        punch = body("Sunflowers, pinecones and pineapples all quietly agree "
-                     "on one angle.")
+        punch = body(
+            "Sunflowers, pinecones and pineapples all quietly agree on one angle."
+        )
         self.stack([punch], top=-0.90)
-        last = body("Not beauty. Not coincidence. Just the number that fractions "
-                    "cannot catch.", color=GOLD)
+        last = body(
+            "Not beauty. Not coincidence. Just the number that fractions cannot catch.",
+            color=GOLD,
+        )
         self.stack([last], top=-2.00)
 
         with self.voiceover(
@@ -930,11 +1137,16 @@ class TheMostIrrationalNumber(Base):
         ) as tr:
             d = tr.duration
             self.play(FadeIn(head), FadeIn(row0), FadeIn(sub), run_time=d * 0.22)
-            self.play(turns.animate.set_value(GOLD_T), run_time=d * 0.42,
-                      rate_func=smooth)
-            self.play(FadeIn(row1), Flash(dots, color=ACID, line_length=0.3,
-                                          num_lines=18, flash_radius=2.7),
-                      run_time=d * 0.16)
+            self.play(
+                turns.animate.set_value(GOLD_T), run_time=d * 0.42, rate_func=smooth
+            )
+            self.play(
+                FadeIn(row1),
+                Flash(
+                    dots, color=ACID, line_length=0.3, num_lines=18, flash_radius=2.7
+                ),
+                run_time=d * 0.16,
+            )
             self.play(FadeIn(punch), run_time=d * 0.20)
             self.rest(tr)
 
@@ -945,24 +1157,31 @@ class TheMostIrrationalNumber(Base):
             self.play(FadeIn(last), run_time=min(1.4, tr.duration * 0.6))
             self.rest(tr)
 
-        card_phi = tex(r"\varphi = \frac{1+\sqrt{5}}{2} = 1.6180339887\ldots",
-                       36, GOLD, 7.0).move_to([0, 1.15, 0])
-        card_ang = tex(r"360^{\circ}/\varphi^{2} = 137.5077640^{\circ}",
-                       36, CYAN, 7.0).move_to([0, 0.20, 0])
-        card_lim = tex(r"\lim_{n\to\infty}\frac{F_{n+1}}{F_n} = \varphi",
-                       32, DIM, 7.0).move_to([0, -0.85, 0])
-        tag = txt("THE MOST IRRATIONAL NUMBER", 30, INK, 8.0,
-                  weight=BOLD).move_to([0, -2.15, 0])
+        card_phi = tex(
+            r"\varphi = \frac{1+\sqrt{5}}{2} = 1.6180339887\ldots", 36, GOLD, 7.0
+        ).move_to([0, 1.15, 0])
+        card_ang = tex(
+            r"360^{\circ}/\varphi^{2} = 137.5077640^{\circ}", 36, CYAN, 7.0
+        ).move_to([0, 0.20, 0])
+        card_lim = tex(
+            r"\lim_{n\to\infty}\frac{F_{n+1}}{F_n} = \varphi", 32, DIM, 7.0
+        ).move_to([0, -0.85, 0])
+        tag = txt("THE MOST IRRATIONAL NUMBER", 30, INK, 8.0, weight=BOLD).move_to(
+            [0, -2.15, 0]
+        )
         tag.set_color_by_gradient(GOLD, MAGENTA, CYAN)
 
-        self.play(FadeOut(VGroup(dots, ring, head, row0, row1, sub, punch, last)),
-                  run_time=0.9)
+        self.play(
+            FadeOut(VGroup(dots, ring, head, row0, row1, sub, punch, last)),
+            run_time=0.9,
+        )
         self.play(Write(card_phi), run_time=1.3)
         self.play(Write(card_ang), run_time=1.3)
         self.play(FadeIn(card_lim), FadeIn(tag, shift=UP * 0.15), run_time=1.2)
         self.wait(2.0)
         self.play(self.prog.animate.set_value(1.0), run_time=1.0)
         self.rail_fill.clear_updaters()
-        self.play(FadeOut(VGroup(card_phi, card_ang, card_lim, tag, self._chap)),
-                  run_time=1.4)
+        self.play(
+            FadeOut(VGroup(card_phi, card_ang, card_lim, tag, self._chap)), run_time=1.4
+        )
         self.wait(0.5)

@@ -38,18 +38,18 @@ config.frame_height = 9
 config.frame_rate = 30
 
 # ------------------------------------------------------------------ palette
-BG      = "#07070f"
-INK     = "#f1eff9"
-DIM     = "#8f8bad"
-BLUE    = "#4d7cff"
-CYAN    = "#2ee6d6"
+BG = "#07070f"
+INK = "#f1eff9"
+DIM = "#8f8bad"
+BLUE = "#4d7cff"
+CYAN = "#2ee6d6"
 MAGENTA = "#ff2d95"
-GOLD    = "#ffc233"
-ACID    = "#b6ff3d"
-CHORD   = ["#2ee6d6", "#3aa0ff", "#4d7cff", "#7c6bff", "#b45cff", "#ff2d95", "#ff5cc8"]
+GOLD = "#ffc233"
+ACID = "#b6ff3d"
+CHORD = ["#2ee6d6", "#3aa0ff", "#4d7cff", "#7c6bff", "#b45cff", "#ff2d95", "#ff5cc8"]
 
-LEFT_X  = -7.30
-ROT     = PI / 2          # cusp to the top: the heart orientation
+LEFT_X = -7.30
+ROT = PI / 2  # cusp to the top: the heart orientation
 CHORD_W = 2.4
 
 
@@ -67,8 +67,8 @@ def fit(mob, maxw):
 
 
 def lerp_hex(h1, h2, t):
-    a = np.array([int(h1[i:i + 2], 16) for i in (1, 3, 5)], float)
-    b = np.array([int(h2[i:i + 2], 16) for i in (1, 3, 5)], float)
+    a = np.array([int(h1[i : i + 2], 16) for i in (1, 3, 5)], float)
+    b = np.array([int(h2[i : i + 2], 16) for i in (1, 3, 5)], float)
     return "#%02x%02x%02x" % tuple(np.round(a + (b - a) * t).astype(int))
 
 
@@ -95,9 +95,14 @@ def tracked(s, size, color, tracking=0.10, weight=NORMAL, space=0.30):
 def pill(s, size=26, color=ACID, tracking=0.11):
     t = tracked(s, size, color, tracking, weight=BOLD)
     box = RoundedRectangle(
-        corner_radius=0.16, width=t.width + 0.60, height=t.height + 0.36,
-        stroke_color=color, stroke_width=1.8, stroke_opacity=0.85,
-        fill_color=color, fill_opacity=0.12,
+        corner_radius=0.16,
+        width=t.width + 0.60,
+        height=t.height + 0.36,
+        stroke_color=color,
+        stroke_width=1.8,
+        stroke_opacity=0.85,
+        fill_color=color,
+        fill_opacity=0.12,
     )
     t.move_to(box.get_center())
     return VGroup(box, t)
@@ -131,48 +136,59 @@ def backdrop(scene, glow_at=(3.90, 0.10)):
                 lattice.add(Dot(p, radius=0.014, color=DIM, fill_opacity=0.13))
     scene.add(lattice)
 
-    halo = VGroup(*[
-        Circle(radius=r, stroke_width=0, fill_color=BLUE, fill_opacity=o).move_to(c)
-        for r, o in ((4.4, 0.045), (3.4, 0.05), (2.4, 0.045))
-    ])
+    halo = VGroup(
+        *[
+            Circle(radius=r, stroke_width=0, fill_color=BLUE, fill_opacity=o).move_to(c)
+            for r, o in ((4.4, 0.045), (3.4, 0.05), (2.4, 0.045))
+        ]
+    )
     scene.add(halo)
 
 
 # ------------------------------------------------------------------- the mark
 def cardioid(target, R, n=200, highlight=(), chord_w=CHORD_W, dots_every=4):
     """Chords k -> 2k (mod n), cusp rotated to the top, heart optically centred."""
-    C = P3(target) - np.array([0.0, 0.25 * R, 0.0])   # bbox centre, not ring centre
+    C = P3(target) - np.array([0.0, 0.25 * R, 0.0])  # bbox centre, not ring centre
     ang = lambda k: TAU * k / n + ROT
     pt = lambda k: C + R * np.array([np.cos(ang(k)), np.sin(ang(k)), 0.0])
 
-    ring = Circle(radius=R, stroke_color=DIM, stroke_width=1.5,
-                  stroke_opacity=0.32).move_to(C)
+    ring = Circle(
+        radius=R, stroke_color=DIM, stroke_width=1.5, stroke_opacity=0.32
+    ).move_to(C)
     glow, chords = VGroup(), VGroup()
     for k in range(1, n):
         hot = k in highlight
         col = GOLD if hot else ramp_at(k / (n - 1))
         w = chord_w * 2.3 if hot else chord_w
-        ln = Line(pt(k), pt(2 * k), stroke_color=col, stroke_width=w,
-                  stroke_opacity=1.0 if hot else 0.92)
+        ln = Line(
+            pt(k),
+            pt(2 * k),
+            stroke_color=col,
+            stroke_width=w,
+            stroke_opacity=1.0 if hot else 0.92,
+        )
         glow.add(ln.copy().set_stroke(width=w * 3.6, opacity=0.10))
         chords.add(ln)
 
     assert len(chords) == n - 1
-    assert all(np.linalg.norm(l.get_end() - l.get_start()) > 1e-9 for l in chords), \
+    assert all(np.linalg.norm(l.get_end() - l.get_start()) > 1e-9 for l in chords), (
         "degenerate chord: k = 0 must stay excluded"
+    )
     print(f"  cardioid: {len(chords)} straight chords, n={n}, cusp at top")
 
-    dots = VGroup(*[
-        Dot(pt(k), radius=0.032, color=ramp_at(k / (n - 1)))
-        for k in range(0, n, dots_every)
-    ])
+    dots = VGroup(
+        *[
+            Dot(pt(k), radius=0.032, color=ramp_at(k / (n - 1)))
+            for k in range(0, n, dots_every)
+        ]
+    )
     cusp = Dot(pt(0), radius=0.070, color="#ffffff")
     return VGroup(ring, glow, chords, dots, cusp)
 
 
 def caption(scene, s, target, R, dy=0.55):
     """Sits below the heart's lowest point, clear of the duration stamp."""
-    low = P3(target)[1] - 0.25 * R - 0.5 * R      # heart bottom
+    low = P3(target)[1] - 0.25 * R - 0.5 * R  # heart bottom
     t = Text(s, font_size=26, color=DIM)
     t.move_to([P3(target)[0], low - dy, 0.0])
     scene.add(t)
@@ -208,8 +224,16 @@ class ThumbnailStraight(Scene):
         self.add(center_block([kick, l1, l2, foot], y=0.20, buff=0.32))
 
         # few enough chords that the straightness is unmistakable
-        self.add(cardioid((3.90, 0.10), 3.00, n=60,
-                          highlight=(13, 22, 41), chord_w=2.8, dots_every=2))
+        self.add(
+            cardioid(
+                (3.90, 0.10),
+                3.00,
+                n=60,
+                highlight=(13, 22, 41),
+                chord_w=2.8,
+                dots_every=2,
+            )
+        )
         caption(self, "60 straight chords, three picked out", (3.90, 0.10), 3.00)
 
 

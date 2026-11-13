@@ -40,18 +40,18 @@ config.frame_height = 16
 config.frame_rate = 30
 
 # ------------------------------------------------------------------ palette
-BG      = "#07070f"
-INK     = "#f1eff9"
-DIM     = "#8f8bad"
-BLUE    = "#4d7cff"
-CYAN    = "#00e5d0"
+BG = "#07070f"
+INK = "#f1eff9"
+DIM = "#8f8bad"
+BLUE = "#4d7cff"
+CYAN = "#00e5d0"
 MAGENTA = "#ff2d95"
-GOLD    = "#ffc233"
-ACID    = "#b6ff3d"
-LEVELS  = ["#4d7cff", "#00e5d0", "#b6ff3d", "#ffc233", "#ff2d95", "#a06bff"]
+GOLD = "#ffc233"
+ACID = "#b6ff3d"
+LEVELS = ["#4d7cff", "#00e5d0", "#b6ff3d", "#ffc233", "#ff2d95", "#a06bff"]
 
-SHRINK  = np.sqrt(2) - 1
-COL_W   = 7.40
+SHRINK = np.sqrt(2) - 1
+COL_W = 7.40
 
 
 # ------------------------------------------------------------------ helpers
@@ -83,9 +83,14 @@ def tracked(s, size, color, tracking=0.10, weight=NORMAL, space=0.30):
 def pill(s, size=30, color=ACID, tracking=0.12):
     t = tracked(s, size, color, tracking, weight=BOLD)
     box = RoundedRectangle(
-        corner_radius=0.18, width=t.width + 0.70, height=t.height + 0.42,
-        stroke_color=color, stroke_width=2.0, stroke_opacity=0.85,
-        fill_color=color, fill_opacity=0.12,
+        corner_radius=0.18,
+        width=t.width + 0.70,
+        height=t.height + 0.42,
+        stroke_color=color,
+        stroke_width=2.0,
+        stroke_opacity=0.85,
+        fill_color=color,
+        fill_opacity=0.12,
     )
     t.move_to(box.get_center())
     return VGroup(box, t)
@@ -114,11 +119,14 @@ def backdrop(scene, glow_at=(0.0, 0.30)):
                 lattice.add(Dot(p, radius=0.018, color=DIM, fill_opacity=0.14))
     scene.add(lattice)
 
-    halo = VGroup(*[
-        Square(side_length=s, stroke_width=0, fill_color=BLUE,
-               fill_opacity=o).move_to(c)
-        for s, o in ((8.6, 0.030), (7.0, 0.036), (5.8, 0.040))
-    ])
+    halo = VGroup(
+        *[
+            Square(
+                side_length=s, stroke_width=0, fill_color=BLUE, fill_opacity=o
+            ).move_to(c)
+            for s, o in ((8.6, 0.030), (7.0, 0.036), (5.8, 0.040))
+        ]
+    )
     scene.add(halo)
 
 
@@ -129,7 +137,9 @@ def dissection(A, center):
     B = A / np.sqrt(2.0)
     d = (A - B) / 2.0
     g = {
-        "A": A, "B": B, "C": C,
+        "A": A,
+        "B": B,
+        "C": C,
         "s1": C + np.array([-d, d, 0.0]),
         "s2": C + np.array([d, -d, 0.0]),
         "ov": 2.0 * B - A,
@@ -137,9 +147,8 @@ def dissection(A, center):
         "gTR": C + np.array([B / 2, B / 2, 0.0]),
         "gBL": C - np.array([B / 2, B / 2, 0.0]),
     }
-    assert abs(2 * B ** 2 - A ** 2) < 1e-9, "2b^2 must equal a^2"
-    assert abs(g["ov"] ** 2 - 2 * g["gap"] ** 2) < 1e-9, \
-        "(2b-a)^2 must equal 2(a-b)^2"
+    assert abs(2 * B**2 - A**2) < 1e-9, "2b^2 must equal a^2"
+    assert abs(g["ov"] ** 2 - 2 * g["gap"] ** 2) < 1e-9, "(2b-a)^2 must equal 2(a-b)^2"
     assert abs(g["ov"] / A - SHRINK) < 1e-12, "descent ratio must be sqrt(2)-1"
     return g
 
@@ -147,21 +156,52 @@ def dissection(A, center):
 def figure(g, labels=True, lab_scale=1.0):
     A, B, C = g["A"], g["B"], g["C"]
 
-    big = Square(side_length=A, stroke_color=BLUE, stroke_width=4,
-                 fill_color=BLUE, fill_opacity=0.08).move_to(C)
-    s1 = Square(side_length=B, stroke_color=GOLD, stroke_width=3,
-                fill_color=GOLD, fill_opacity=0.20).move_to(g["s1"])
-    s2 = Square(side_length=B, stroke_color=GOLD, stroke_width=3,
-                fill_color=GOLD, fill_opacity=0.20).move_to(g["s2"])
+    big = Square(
+        side_length=A,
+        stroke_color=BLUE,
+        stroke_width=4,
+        fill_color=BLUE,
+        fill_opacity=0.08,
+    ).move_to(C)
+    s1 = Square(
+        side_length=B,
+        stroke_color=GOLD,
+        stroke_width=3,
+        fill_color=GOLD,
+        fill_opacity=0.20,
+    ).move_to(g["s1"])
+    s2 = Square(
+        side_length=B,
+        stroke_color=GOLD,
+        stroke_width=3,
+        fill_color=GOLD,
+        fill_opacity=0.20,
+    ).move_to(g["s2"])
 
-    ov_glow = Square(side_length=g["ov"] * 1.5, stroke_width=0,
-                     fill_color=MAGENTA, fill_opacity=0.14).move_to(C)
-    ov = Square(side_length=g["ov"], stroke_color=MAGENTA, stroke_width=3,
-                fill_color=MAGENTA, fill_opacity=0.45).move_to(C)
-    gTR = Square(side_length=g["gap"], stroke_color=CYAN, stroke_width=3,
-                 fill_color=CYAN, fill_opacity=0.34).move_to(g["gTR"])
-    gBL = Square(side_length=g["gap"], stroke_color=CYAN, stroke_width=3,
-                 fill_color=CYAN, fill_opacity=0.34).move_to(g["gBL"])
+    ov_glow = Square(
+        side_length=g["ov"] * 1.5, stroke_width=0, fill_color=MAGENTA, fill_opacity=0.14
+    ).move_to(C)
+    ov = Square(
+        side_length=g["ov"],
+        stroke_color=MAGENTA,
+        stroke_width=3,
+        fill_color=MAGENTA,
+        fill_opacity=0.45,
+    ).move_to(C)
+    gTR = Square(
+        side_length=g["gap"],
+        stroke_color=CYAN,
+        stroke_width=3,
+        fill_color=CYAN,
+        fill_opacity=0.34,
+    ).move_to(g["gTR"])
+    gBL = Square(
+        side_length=g["gap"],
+        stroke_color=CYAN,
+        stroke_width=3,
+        fill_color=CYAN,
+        fill_opacity=0.34,
+    ).move_to(g["gBL"])
 
     parts = VGroup(big, s1, s2, ov_glow, gTR, gBL, ov)
 
@@ -182,13 +222,20 @@ def nested(center, A, levels=6):
     """Concentric a-squares: the descent, shrinking by sqrt(2)-1 each level."""
     C, s, g = P3(center), A, VGroup()
     for i in range(levels):
-        g.add(Square(side_length=s, stroke_color=LEVELS[i % len(LEVELS)],
-                     stroke_width=3.2 if i == 0 else 2.4,
-                     stroke_opacity=0.95 if i == 0 else 0.80,
-                     fill_opacity=0).move_to(C))
+        g.add(
+            Square(
+                side_length=s,
+                stroke_color=LEVELS[i % len(LEVELS)],
+                stroke_width=3.2 if i == 0 else 2.4,
+                stroke_opacity=0.95 if i == 0 else 0.80,
+                fill_opacity=0,
+            ).move_to(C)
+        )
         s *= SHRINK
-    print(f"  descent: {levels} levels, sides "
-          + ", ".join(f"{A * SHRINK ** i:.3f}" for i in range(levels)))
+    print(
+        f"  descent: {levels} levels, sides "
+        + ", ".join(f"{A * SHRINK**i:.3f}" for i in range(levels))
+    )
     return g
 
 
@@ -199,19 +246,23 @@ class ThumbnailSquare(Scene):
         backdrop(self, glow_at=(0.0, 0.30))
 
         kick = pill("ONE PICTURE PROOF", 30, ACID)
-        hero = fit(MathTex(r"\sqrt{2} \neq \frac{a}{b}", font_size=170,
-                           color=GOLD), COL_W)
+        hero = fit(
+            MathTex(r"\sqrt{2} \neq \frac{a}{b}", font_size=170, color=GOLD), COL_W
+        )
         self.add(stack([kick, hero], top=7.05, buff=0.46))
 
         g = dissection(5.80, (0.0, 0.30))
         self.add(figure(g))
-        print(f"  figure: a={g['A']:.3f} b={g['B']:.3f} "
-              f"overlap={g['ov']:.3f} gap={g['gap']:.3f}")
+        print(
+            f"  figure: a={g['A']:.3f} b={g['B']:.3f} "
+            f"overlap={g['ov']:.3f} gap={g['gap']:.3f}"
+        )
 
         eq = fit(MathTex(r"(2b-a)^2 = 2(a-b)^2", font_size=54, color=CYAN), COL_W)
         eq.move_to([0.0, -3.55, 0.0])
-        foot = fit(Text("smaller whole numbers, forever", font_size=34, color=DIM),
-                   COL_W)
+        foot = fit(
+            Text("smaller whole numbers, forever", font_size=34, color=DIM), COL_W
+        )
         foot.move_to([0.0, -4.35, 0.0])
         self.add(eq, foot)
 
@@ -232,11 +283,11 @@ class ThumbnailDescent(Scene):
         base.set_stroke(opacity=0.30).set_fill(opacity=0.10)
         self.add(base, nested((0.0, -0.60), 5.60, levels=6))
 
-        ratio = fit(MathTex(r"\sqrt{2}-1 = 0.41421\ldots", font_size=50,
-                            color=CYAN), COL_W)
+        ratio = fit(
+            MathTex(r"\sqrt{2}-1 = 0.41421\ldots", font_size=50, color=CYAN), COL_W
+        )
         ratio.move_to([0.0, -3.95, 0.0])
-        foot = fit(Text("every step, smaller integers", font_size=32, color=DIM),
-                   COL_W)
+        foot = fit(Text("every step, smaller integers", font_size=32, color=DIM), COL_W)
         foot.move_to([0.0, -4.60, 0.0])
         self.add(ratio, foot)
 
@@ -256,5 +307,7 @@ class ThumbnailNoFraction(Scene):
 
         g = dissection(3.80, (0.0, -2.20))
         self.add(figure(g, labels=True, lab_scale=0.72))
-        print(f"  figure: a={g['A']:.3f} b={g['B']:.3f} "
-              f"overlap={g['ov']:.3f} gap={g['gap']:.3f}")
+        print(
+            f"  figure: a={g['A']:.3f} b={g['B']:.3f} "
+            f"overlap={g['ov']:.3f} gap={g['gap']:.3f}"
+        )
