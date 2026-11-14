@@ -13,9 +13,7 @@ chords, the sunflower is Vogel's model, the gasket is Lucas' theorem mod 2, and 
 winning slide is a cycloid solved by bisection. Where an identity matters, it is
 **asserted at build time** — if the maths drifts, the render fails.
 
-📽️ **Live gallery & figure lab:** [`docs/index.html`](docs/index.html) — open it in a
-browser, or serve it with GitHub Pages. Every figure on that page is computed with
-the same formulas as the films, and exports to PNG/SVG.
+
 
 ---
 
@@ -175,8 +173,6 @@ Shared across every film and still, so a thumbnail and its film read as one obje
 
 ```
 behold-studio/
-├── docs/
-│   └── index.html          # live gallery + figure lab (no build step, no deps)
 ├── pictures/
 │   ├── banner_image.py     # 2560×1440 banner, three modes
 │   ├── picture.py          # 1024×1024 avatars
@@ -198,7 +194,6 @@ behold-studio/
    at import. If a number appears on screen, it must have been computed.
 4. Add `pictures/videoN_thumbnail.py` with three angles: the recommended one, the
    surprise, and the question. Check all three at `PREVIEW = True`.
-5. Add the entry to the table above and to `FILMS` in `docs/index.html`.
 
 ## Troubleshooting
 
